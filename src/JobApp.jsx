@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
 // --- CONFIG --------------------------------------------------------------
-const JSEARCH_KEY = "82c67a2db2msh8abb5ccb0daacd7p1b00c8jsn281ed9d9eac9";
-
 const SEARCH_QUERIES = [
   "Customer Experience Program Manager remote",
   "Director of Operations remote",
@@ -10,6 +8,7 @@ const SEARCH_QUERIES = [
   "Program Manager people operations remote",
 ];
 
+// Keywords for scoring
 const ROLE_KEYWORDS = [
   "operations", "chief of staff", "program manager", "process", "director",
   "customer experience", "member experience", "client experience",
@@ -42,13 +41,12 @@ const timeAgo = (ts) => {
   return `${Math.floor(diff / 86400)}d ago`;
 };
 
-// --- MAIN SIMPLIFIED APP --------------------------------------------------
+// --- MAIN APP -------------------------------------------------------------
 export default function JobApp() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  // Fetch jobs from RapidAPI directly (no backend)
   const fetchJobs = useCallback(async () => {
     setLoading(true);
     setErrorMsg(null);
@@ -57,18 +55,13 @@ export default function JobApp() {
 
     for (const q of SEARCH_QUERIES) {
       try {
-        const url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(
-          q
-        )}&num_pages=1`;
-        const res = await fetch(url, {
-          headers: {
-            "x-rapidapi-host": "jsearch.p.rapidapi.com",
-            "x-rapidapi-key": JSEARCH_KEY,
-          },
-        });
-        if (!res.ok) throw new Error("API error");
+        // ✅ BUILD QUERY STRING
+        const qs = `query=${encodeURIComponent(q)}&num_pages=1`;
 
+        // ✅ CALL YOUR VERCEL BACKEND (NO MORE CORS ERRORS)
+        const res = await fetch(`/api/jsearch?q=${qs}`);
         const data = await res.json();
+
         const items = data.data || [];
 
         items.forEach((j) => {
