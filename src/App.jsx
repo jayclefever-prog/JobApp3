@@ -1,5 +1,5 @@
-
 import JobApp from "./JobApp.jsx";
-export default function App() { 
-  return <JobApp />; 
+
+export default function App() {
+  return <JobApp />;
 }
